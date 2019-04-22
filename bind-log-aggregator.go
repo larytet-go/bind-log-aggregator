@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"time"
 
 	"transactionlogger"
 )
@@ -14,7 +15,14 @@ func main() {
 	flag.Parse()
 
 	fmt.Printf("Aggregator is staring ...\n")
-	publisher, msg := transactionlogger.New(*loggerUrl, *useUdp)
-	fmt.Printf("%s\n", msg)
-	publisher.Push("Hello")
+	var publisher transactionlogger.Publisher
+	msg := ""
+	for {
+		publisher, msg = transactionlogger.New(*loggerUrl, *useUdp)
+		fmt.Printf("%s\n", msg)
+		if publisher != nil {
+			break
+		}
+		time.Sleep(1 * time.Second)
+	}
 }
