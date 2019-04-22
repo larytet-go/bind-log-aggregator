@@ -50,17 +50,17 @@ func main() {
 		handler := syslog.NewChannelHandler(channel)
 
 		server := syslog.NewServer()
-		server.SetFormat(syslog.RFC5424)
+		server.SetFormat(syslog.RFC3164)
 		server.SetHandler(handler)
 		server.ListenUDP(*syslogIp)
 		server.Boot()
 		go func(channel syslog.LogPartsChannel) {
 			for logParts := range channel {
-				msg := logParts["message"].(string)
+				msg := logParts["content"].(string)
 				publisher.Push(msg)
+				//fmt.Printf("%v\n", logParts)
 			}
 		}(channel)		
-		server.Wait()
-		//fmt.Printf("%v\n", err)
+		server.Wait()		
 	}
 }
