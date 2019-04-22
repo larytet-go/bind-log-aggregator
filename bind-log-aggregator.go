@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"os"
@@ -15,7 +16,7 @@ import (
 func main() {
 	useUdp := flag.Bool("udp", false, "Use UDP for rsyslog")
 	loggerUrl := flag.String("logger", "rsyslog://127.0.0.1", "For example 'stdout' or 'file://./dns_activity.log'")
-	logFilename := flag.String("logfile", "", "The BIND's log filename, for example '/var/log/named/queries.log'")
+	logFilename := flag.String("logfile", "", "The BIND's log filename, for example '/var/log/named/queries.log', 'stdin'")
 	maxDepth := flag.Int("buffersize", 10*1000*1000, "Maxiumum number of log entries stored in RAM if rsyslog is down")
 	syslogIp := flag.String("syslogip", "", "Open syslog connection for BIND, for example '0.0.0.0:514'")
 	flag.Parse()
@@ -32,6 +33,20 @@ func main() {
 		time.Sleep(1 * time.Second)
 	}
 
+	if *logFilename  == "stdin" {
+		fmt.Printf("Waiting for stdin\n")
+		scanner := bufio.NewScanner(os.Stdin)
+		for scanner.Scan() {
+			line := scanner.Text()
+			publisher.Push(line)
+		}
+		if err := scanner.Err(); err != nil {
+			fmt.Printf("Fail to read stdin %v\n", err)
+			os.Exit(1)
+		}
+		os.Exit(0)
+	}
+
 	if len(*logFilename) != 0 {
 		fmt.Printf("Tail -F %s\n", *logFilename)
 		tailFile, err := tail.TailFile(*logFilename, tail.Config{Follow: true, ReOpen: true})
@@ -42,6 +57,7 @@ func main() {
 		for line := range tailFile.Lines {
 			publisher.Push(line.Text)
 		}
+		os.Exit(0)
 	}
 
 	if len(*syslogIp) != 0 {
@@ -62,5 +78,6 @@ func main() {
 			}
 		}(channel)		
 		server.Wait()		
+		os.Exit(0)
 	}
 }
