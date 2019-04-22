@@ -174,13 +174,13 @@ type Shippable interface {
 type PublisherDummy struct {
 }
 
-func (this *PublisherDummy) Push(s string) {
+func (p *PublisherDummy) Push(s string) {
 }
 
 type PublisherDebug struct {
 }
 
-func (this *PublisherDebug) Push(s string) {
+func (p *PublisherDebug) Push(s string) {
 	fmt.Printf("Transaction %s", s)
 }
 
@@ -191,14 +191,14 @@ type PublisherRsyslog struct {
 	writer *syslog.Writer
 }
 
-func (this *PublisherRsyslog) Push(s string) {
-	this.ch <- s
+func (p *PublisherRsyslog) Push(s string) {
+	p.ch <- s
 }
 
-func (this *PublisherRsyslog) start() {
+func (p *PublisherRsyslog) start() {
 	go func() {
 		for {
-			s := <-this.ch
+			s := <-p.ch
 			this.writer.Debug(s + "\n")
 		}
 	}()
@@ -209,15 +209,15 @@ type PublisherStdout struct {
 	ch       chan string
 }
 
-func (this *PublisherStdout) Push(s string) {
-	this.ch <- s
+func (p *PublisherStdout) Push(s string) {
+	p.ch <- s
 }
 
-func (this *PublisherStdout) start() {
+func (p *PublisherStdout) start() {
 	go func() {
 		for {
-			s := <-this.ch
-			this.outputIo.WriteString(s + "\n")
+			s := <-p.ch
+			this.outputIo.WriteString(s + "\r\n")
 		}
 	}()
 }
