@@ -13,6 +13,7 @@ import (
 	"gopkg.in/mcuadros/go-syslog.v2"
 )
 
+
 func main() {
 	useUdp := flag.Bool("udp", false, "Use UDP for rsyslog")
 	loggerUrl := flag.String("logger", "rsyslog://127.0.0.1", "For example 'stdout' or 'file://./dns_activity.log'")
