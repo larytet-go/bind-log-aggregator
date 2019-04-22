@@ -15,13 +15,14 @@ func main() {
 	useUdp := flag.Bool("udp", false, "Use UDP for rsyslog")
 	loggerUrl := flag.String("logger", "rsyslog://127.0.0.1", "For example 'stdout'")
 	logFilename := flag.String("logfile", "/var/log/named/queries.log", "The bind's log filename")
+	maxDepth := flag.Int("buffersize", 10*1000*1000, "Maxiumum number of log entries stored in RAM if rsyslog is down")
 	flag.Parse()
 
 	fmt.Printf("Aggregator is staring ...\n")
 	var publisher transactionlogger.Publisher
 	msg := ""
 	for {
-		publisher, msg = transactionlogger.New(*loggerUrl, *useUdp)
+		publisher, msg = transactionlogger.New(*maxDepth, *loggerUrl, *useUdp)
 		fmt.Printf("%s\n", msg)
 		if publisher != nil {
 			break
