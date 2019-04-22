@@ -3,25 +3,18 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
 	"time"
 
 	"transactionlogger"
+
+	"github.com/hpcloud/tail"
 )
-
-func getOldestLogfile(logFolder string) {
-
-}
-
-// Pick the oldest not empty file, read the content, parse, output,
-// remove the file content (keep the file itself), repeat
-func tailLog(logFolder string) {
-
-}
 
 func main() {
 	useUdp := flag.Bool("udp", false, "Use UDP for rsyslog")
 	loggerUrl := flag.String("logger", "rsyslog://127.0.0.1", "For example 'stdout'")
-	logFolder := flag.String("logfolder", "/var/log/named", "The bind's log folder")
+	logFilename := flag.String("logfile", "/var/log/named/queries.log", "The bind's log filename")
 	flag.Parse()
 
 	fmt.Printf("Aggregator is staring ...\n")
@@ -35,5 +28,13 @@ func main() {
 		}
 		time.Sleep(1 * time.Second)
 	}
-	go tailLog(*logFolder)
+
+	tailFile, err := tail.TailFile(*logFilename, tail.Config{Follow: true, ReOpen: true})
+	if err != nil {
+		fmt.Printf("Failed to tail log file %v\n", err)
+		os.Exit(1)
+	}
+	for line := range tailFile.Lines {
+		fmt.Println(line.Text)
+	}
 }
