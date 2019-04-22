@@ -199,7 +199,7 @@ func (p *PublisherRsyslog) start() {
 	go func() {
 		for {
 			s := <-p.ch
-			this.writer.Debug(s + "\n")
+			p.writer.Debug(s + "\n")
 		}
 	}()
 }
@@ -216,8 +216,8 @@ func (p *PublisherStdout) Push(s string) {
 func (p *PublisherStdout) start() {
 	go func() {
 		for {
-			s := <-p.ch
-			this.outputIo.WriteString(s + "\r\n")
+			<-p.ch
+			//p.outputIo.WriteString(s + "\r\n")
 		}
 	}()
 }
