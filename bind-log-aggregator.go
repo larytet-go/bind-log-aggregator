@@ -25,7 +25,7 @@ func main() {
 	var publisher transactionlogger.Publisher
 	msg := ""
 	for {
-		publisher, msg = transactionlogger.New(*maxDepth, *loggerUrl, *useUdp)
+		publisher, msg = transactionlogger.Ne w(*maxDepth, *loggerUrl, *useUdp)
 		fmt.Printf("%s\n", msg)
 		if publisher != nil {
 			break
