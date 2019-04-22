@@ -6,6 +6,11 @@ tail -F queries.log
 dig @127.0.0.1 -p 5301 google.com
 ```
 
+# Test the stdin 
+
+```
+go build bind-log-aggregator.go && sudo docker run --name bind -it --rm   --publish 5301:53/tcp --publish 5301:53/udp --publish 10000:10000/tcp    "/usr/sbin/named" sameersbn/bind -c /data/named.conf -f -u bind | ./bind-log-aggregator -logger stdout --logfile stdin
+```
 
 # Test the syslog 
 
