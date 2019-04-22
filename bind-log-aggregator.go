@@ -54,8 +54,12 @@ func main() {
 		server.SetHandler(handler)
 		server.ListenUDP(*syslogIp)
 		server.Boot()
-		for logParts := range channel {
-			fmt.Printf("%v", logParts)
-		}
+		go func(channel syslog.LogPartsChannel) {
+			for logParts := range channel {
+				fmt.Printf("%v\n", logParts)
+			}
+		}(channel)		
+		server.Wait()
+		//fmt.Printf("%v\n", err)
 	}
 }
