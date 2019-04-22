@@ -56,7 +56,8 @@ func main() {
 		server.Boot()
 		go func(channel syslog.LogPartsChannel) {
 			for logParts := range channel {
-				fmt.Printf("%v\n", logParts)
+				msg := logParts["message"].(string)
+				publisher.Push(msg)
 			}
 		}(channel)		
 		server.Wait()
